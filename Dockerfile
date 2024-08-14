@@ -13,9 +13,13 @@ ENV PYTHONUNBUFFERED 1
 # tmp는 빌드가 완료되면 삭제 예정이라
 COPY ./requirements.txt /tmp/requirements.txt
 COPY ./requirements.dev.txt /tmp/requirements.dev.txt
+COPY ./app /app
 
+WORKDIR /app
 # django port번호가 8000으로 문을 열어줌
 EXPOSE 8000
+
+ARG DEV=false
 
 # && \: Enter
 # 리눅스 기반의 명령어
@@ -23,6 +27,9 @@ EXPOSE 8000
 RUN python -m venv /py && \
     /py/bin/pip install --upgrade pip && \
     /py/bin/pip install -r /tmp/requirements.txt && \
+    if [ $DEV = "true" ]; \
+        then /py/bin/pip install -r /tmp/requirements.dev.txt ; \
+    fi && \
     rm -rf /tmp && \
     adduser \
         --disabled-password \
